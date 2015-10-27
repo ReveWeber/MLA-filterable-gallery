@@ -1,0 +1,99 @@
+/* Gallery Menu Styling */
+
+.filtration-gallery {
+    position: relative;
+}
+
+.album-selector {
+    width: 60%;
+    margin-left: 40%;
+    margin-top: -66px;
+    margin-bottom: 24px;
+}
+
+.album-button {
+    text-align: center;
+    width: 45%;
+    margin-left: 55%;
+    padding: 4px;
+    border-radius: 0.25em;
+    background: linear-gradient(to bottom, #1b4a21, #31b34a, #31b34a, #1b4a21);
+    border: 1px solid #444;
+}
+
+.mla-parent-categories {
+    border: 3px solid #31b34a;
+    list-style: none;
+    margin: 0;
+    padding: 24px 0;
+    background: white;
+    background: rgba(255, 255, 255, 0.9);
+    position: relative;
+}
+
+.mla-parent-categories > li {
+    padding-left: 30px;
+}
+
+.mla-parent-categories > li:hover > a {
+    text-decoration: underline;
+}
+
+.mla-sub-categories li:hover > a {
+    font-weight: bold;
+}
+
+.album-arrows {
+    font-size: 75%;
+    padding-left: 4px;
+    vertical-align: middle;
+}
+
+.mla-sub-categories {
+    list-style: none;
+    width: 60%;
+    padding-right: 24px;
+    padding-left: 24px;
+    margin-left: 20%;
+    background: rgb(49, 179, 74);
+    background: rgba(49, 179, 74, 0.9);
+}
+
+.mla-parent-categories a {
+    text-decoration: none;
+    color: black;
+}
+
+.current-album {
+    overflow: hidden;
+}
+
+.album-with-js {
+    position: absolute;
+}
+
+.album-with-js .album-button {
+    cursor: pointer;
+}
+
+.album-with-js .mla-sub-categories {
+    position: absolute;
+    right: 100%;
+    margin-top: -1.5em;
+    display: none;
+}
+
+.album-with-js .mla-parent-categories li:hover .mla-sub-categories,
+.album-with-js .mla-parent-categories a.hover ~ .mla-sub-categories {
+    display: block;
+}
+
+.album-with-js .mla-parent-categories > li:hover:before,
+.album-with-js .mla-parent-categories > a.hover:before {
+    content: '\2329\2329';
+    position: absolute;
+    margin-top: 3px;
+    font-size: 75%;
+    letter-spacing: -.5em;
+    margin-left: -1.75em;
+}
