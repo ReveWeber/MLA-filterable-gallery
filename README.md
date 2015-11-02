@@ -14,4 +14,6 @@ least color scheme.
 
 Changelog:
 
+2-11-15: Shortcode allows top level categories to be sorted in ascending or descending order in menu.
+
 Initial commit: Shortcode allows setting category to show when page is loaded; page in admin giving syntax.

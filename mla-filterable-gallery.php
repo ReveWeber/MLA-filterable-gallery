@@ -73,76 +73,12 @@ function filterable_gallery_output( $atts ) {
         return;
     }
     
-    // there are significant missing pieces in the following array. Check mla code for additional calls to shortcode_atts and gather up. Good note, I can segregate the arguments that I'm using for the menu from the ones that are passed through to the original shortcode.
-	$html5 = current_theme_supports( 'html5', 'gallery' );
-    $arguments_from_mla = array(
-        'mla_link_attributes' => '',
-        'mla_link_class' => '',
-        'mla_link_href' => '',
-        'mla_link_text' => '',
-        'mla_nolink_text' => '',
-        'mla_rollover_text' => '',
-        'mla_image_class' => '',
-        'mla_image_alt' => '',
-        'mla_image_attributes' => '',
-        'mla_caption' => '',
-        'mla_output' => 'gallery',
-        'mla_style' => MLAOptions::mla_get_option('default_style'),
-        'mla_markup' => MLAOptions::mla_get_option('default_markup'),
-        'mla_float' => is_rtl() ? 'right' : 'left',
-        'mla_itemwidth' => MLAOptions::mla_get_option('mla_gallery_itemwidth'),
-        'mla_margin' => MLAOptions::mla_get_option('mla_gallery_margin'),
-        'mla_target' => '',
-        'mla_debug' => false,
-        'mla_viewer' => false,
-        'mla_single_thread' => false,
-        'mla_viewer_extensions' => 'ai,eps,pdf,ps',
-        'mla_viewer_limit' => '0',
-        'mla_viewer_width' => '0',
-        'mla_viewer_height' => '0',
-        'mla_viewer_best_fit' => NULL,
-        'mla_viewer_page' => '1',
-        'mla_viewer_resolution' => '0',
-        'mla_viewer_quality' => '0',
-        'mla_viewer_type' => '',
-        'mla_alt_shortcode' => NULL,
-        'mla_alt_ids_name' => 'ids',
-        'mla_end_size'=> 1,
-        'mla_mid_size' => 2,
-        'mla_prev_text' => '&laquo; ' . __( 'Previous', 'media-library-assistant' ),
-        'mla_next_text' => __( 'Next', 'media-library-assistant' ) . ' &raquo;',
-        'mla_paginate_type' => 'plain',
-        'mla_paginate_rows' => NULL,
-        'size' => 'thumbnail', // or 'medium', 'large', 'full' or registered size
-        'itemtag' => $html5 ? 'figure' : 'dl',
-        'icontag' => $html5 ? 'div' : 'dt',
-        'captiontag' => $html5 ? 'figcaption' : 'dd',
-        'columns' => MLAOptions::mla_get_option('mla_gallery_columns'),
-        'link' => 'permalink', // or 'post' or file' or a registered size
-        // Photonic-specific
-        'id' => NULL,
-        'style' => NULL,
-        'type' => 'default', // also used by WordPress.com Jetpack!
-        'thumb_width' => 75,
-        'thumb_height' => 75,
-        'thumbnail_size' => 'thumbnail',
-        'slide_size' => 'large',
-        'slideshow_height' => 500,
-        'fx' => 'fade',
-        'timeout' => 4000,
-        'speed' => 1000,
-        'pause' => NULL,
-		);
-    
     $filtration_arguments = array(
         'default' => '',
         'menu_order' => '',   
     );
-    
-    $all_fmlag_arguments = array_merge($arguments_from_mla, $filtration_arguments);
-    
-// separate this out.
-    $filterable_gallery_atts = shortcode_atts( $all_fmlag_arguments, $atts );
+        
+    $filterable_gallery_atts = shortcode_atts( $filtration_arguments, $atts );
 
     $return_value = '<div class="filtration-gallery" id="filtration-gallery">';
     $return_value .= '<div class="album-selector" id="album-selector">';
@@ -187,11 +123,15 @@ function filterable_gallery_output( $atts ) {
     $return_value .= '<div id="current-album-wrapper">';
     $return_value .= '<div class="current-album" id="current-album">';
     
+    // implode array of atts into string for do_shortcode
+    array_walk($atts, create_function('&$i,$k','$i=" $k=&#39;$i&#39;";'));
+    $att_string = implode($atts,"");
+
     if ( isset( $_GET["album"] ) && term_exists( $_GET["album"], 'attachment_category' ) ) {
         $slugarray = array( 'slug' => $_GET["album"], );
         $albumarray = get_terms( 'attachment_category', $slugarray );
         $return_value .= '<h2>' . $albumarray[0]->name . '</h2>';
-        $return_value .= do_shortcode('[mla_gallery attachment_category=' . $_GET["album"] . ' size=thumbnail link=large mla_caption=""]');
+        $return_value .= do_shortcode('[mla_gallery attachment_category=' . $_GET["album"] . ' ' . $att_string . ' ]');
     } else {
         $default_gallery_name = $first_term_name;
         if ( $filterable_gallery_atts["default"] != $first_term_slug ) {
@@ -201,7 +141,7 @@ function filterable_gallery_output( $atts ) {
             }
         }
         $return_value .= '<h2>' . $default_gallery_name . '</h2>';
-        $return_value .= do_shortcode('[mla_gallery attachment_category=' . $filterable_gallery_atts["default"] . ' size=thumbnail link=large mla_caption=""]');
+        $return_value .= do_shortcode('[mla_gallery attachment_category=' . $filterable_gallery_atts["default"] . ' ' . $att_string . ']');
     }
 
     $return_value .= '</div> <!-- .current-album -->';
