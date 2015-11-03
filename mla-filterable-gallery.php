@@ -69,21 +69,23 @@ function fmlag_admin_page_function() {
 
 add_shortcode( 'filterable_mla_gallery', 'filterable_gallery_output' );
 function filterable_gallery_output( $atts ) {
+    // fail silently if somehow MLA isn't working.
     if ( ! shortcode_exists( 'mla_gallery' ) ) {
         return;
     }
     
     $filtration_arguments = array(
-        'default' => '',
+        'default_album' => '',
         'menu_order' => '',   
     );
-        
     $filterable_gallery_atts = shortcode_atts( $filtration_arguments, $atts );
 
+    // open the divs for the gallery and menu
     $return_value = '<div class="filtration-gallery" id="filtration-gallery">';
     $return_value .= '<div class="album-selector" id="album-selector">';
     $return_value .= '<div class="album-button" id="album-button"> Select an Album </div>';
     
+    // create the menu
     if (strtolower($filterable_gallery_atts["menu_order"]) == "desc") {
         $filterable_gallery_atts["menu_order"] = "DESC";
     } else {
@@ -120,30 +122,34 @@ function filterable_gallery_output( $atts ) {
     $return_value .= '</ul> <!-- .mla-parent-category -->';
     $return_value .= '</div> <!-- .album-selector -->';
 
+    // menu area closed out, open up actual gallery area
+    // extra wrapper for ajax purposes
     $return_value .= '<div id="current-album-wrapper">';
     $return_value .= '<div class="current-album" id="current-album">';
     
-    // implode array of atts into string for do_shortcode
-    array_walk($atts, create_function('&$i,$k','$i=" $k=&#39;$i&#39;";'));
-    $att_string = implode($atts,"");
-
+    // add the appropriate attachment category attribute to what was in the
+    // shortcode already and then execute the MLA function
     if ( isset( $_GET["album"] ) && term_exists( $_GET["album"], 'attachment_category' ) ) {
         $slugarray = array( 'slug' => $_GET["album"], );
         $albumarray = get_terms( 'attachment_category', $slugarray );
+        $atts['attachment_category'] = $_GET["album"];
         $return_value .= '<h2>' . $albumarray[0]->name . '</h2>';
-        $return_value .= do_shortcode('[mla_gallery attachment_category=' . $_GET["album"] . ' ' . $att_string . ' ]');
+        $return_value .= MLAShortcodes::mla_gallery_shortcode( $atts );
     } else {
         $default_gallery_name = $first_term_name;
-        if ( $filterable_gallery_atts["default"] != $first_term_slug ) {
-            if( term_exists( $filterable_gallery_atts["default"] ) ) {
-                $default_term = get_term_by( 'name', $filterable_gallery_atts["default"], 'attachment_category' );
+        $atts['attachment_category'] = $first_term_slug;
+        if ( $filterable_gallery_atts["default_album"] != $first_term_slug ) {
+            if( term_exists( $filterable_gallery_atts["default_album"] ) ) {
+                $default_term = get_term_by( 'name', $filterable_gallery_atts["default_album"], 'attachment_category' );
                 $default_gallery_name = $default_term->name;
+                $atts['attachment_category'] = $default_term->slug;
             }
         }
         $return_value .= '<h2>' . $default_gallery_name . '</h2>';
-        $return_value .= do_shortcode('[mla_gallery attachment_category=' . $filterable_gallery_atts["default"] . ' ' . $att_string . ']');
+        $return_value .= MLAShortcodes::mla_gallery_shortcode( $atts );
     }
 
+    // close up shop!
     $return_value .= '</div> <!-- .current-album -->';
     $return_value .= '</div> <!-- #current-album-wrapper -->';
     $return_value .= '</div> <!-- .filtration-gallery -->';
